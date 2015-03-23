@@ -16,22 +16,76 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <hibernate-version>4.3.5.Final</hibernate-version>
-        <hazelcast-version>3.1.7</hazelcast-version>
-        <!-- Do not remove this. It's needed for creating dynamic DeviceHive copies -->
-        <glassfish.tyrus>1.8.2</glassfish.tyrus>
-        <instance.id/>
+        <hibernate-version>4.3.8.Final</hibernate-version>
+        <hazelcast-version>3.4.1</hazelcast-version>
+        <spring-version>4.1.5.RELEASE</spring-version>
+        <spring-security-version>3.2.5.RELEASE</spring-security-version>
+        <spring-boot-version>3.2.5.RELEASE</spring-boot-version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
 
-            <!-- Java EE -->
             <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-api</artifactId>
-                <version>7.0</version>
-                <scope>provided</scope>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.websocket</groupId>
+                <artifactId>javax.websocket-api</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>2.17</version>
+            </dependency>
+
+
+            <!-- Spring -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-websocket</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aspects</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring-version}</version>
             </dependency>
 
             <!-- Logging -->
@@ -68,6 +122,14 @@
                 <artifactId>guava</artifactId>
                 <version>17.0</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>5.2.0.Beta1</version>
+            </dependency>
+
 
 
             <!-- Gson for JSON processing -->

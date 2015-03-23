@@ -18,12 +18,9 @@ import com.devicehive.util.HiveValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
@@ -36,26 +33,25 @@ import static javax.ws.rs.core.Response.Status.*;
 /**
  * This class serves all requests to database from controller.
  */
-@Stateless
-@EJB(beanInterface = UserService.class, name = "UserService")
+@Service
 public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
-    @Inject
+    @Autowired
     private PasswordProcessor passwordService;
-    @EJB
+    @Autowired
     private UserDAO userDAO;
-    @EJB
+    @Autowired
     private NetworkDAO networkDAO;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private HiveValidator hiveValidator;
-    @EJB
+    @Autowired
     private IdentityProviderService identityProviderService;
-    @EJB
+    @Autowired
     private PropertiesService propertiesService;
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -147,7 +143,7 @@ public class UserService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public User updateUser(@NotNull Long id, UserUpdate userToUpdate, UserRole role) {
         User existing = userDAO.findById(id);
 
@@ -221,7 +217,7 @@ public class UserService {
      * @param userId    id of user
      * @param networkId id of network
      */
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public void assignNetwork(@NotNull long userId, @NotNull long networkId) {
         User existingUser = userDAO.findById(userId);
         if (existingUser == null) {
@@ -244,7 +240,7 @@ public class UserService {
      * @param userId    id of user
      * @param networkId id of network
      */
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public void unassignNetwork(@NotNull long userId, @NotNull long networkId) {
         User existingUser = userDAO.findById(userId);
         if (existingUser == null) {
@@ -258,7 +254,7 @@ public class UserService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public List<User> getList(String login, String loginPattern, Integer role, Integer status, String sortField,
                               Boolean sortOrderAsc, Integer take, Integer skip) {
         return userDAO.getList(login, loginPattern, role, status, sortField, sortOrderAsc, take, skip);
@@ -270,7 +266,7 @@ public class UserService {
      * @param id user id
      * @return User model without networks, or null if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public User findById(@NotNull long id) {
         return userDAO.findById(id);
     }
@@ -282,12 +278,12 @@ public class UserService {
      * @param id user id
      * @return User model with networks, or null, if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findUserWithNetworks(@NotNull long id) {
         return userDAO.findUserWithNetworks(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public User createUser(@NotNull User user, String password) {
         if (user.getId() != null) {
             throw new HiveException(Messages.ID_NOT_ALLOWED, BAD_REQUEST.getStatusCode());
@@ -328,32 +324,32 @@ public class UserService {
      * @param id user id
      * @return true in case of success, false otherwise
      */
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public boolean deleteUser(long id) {
         return userDAO.delete(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public boolean hasAccessToDevice(User user, Device device) {
         return user.isAdmin() || userDAO.hasAccessToDevice(user, device);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public boolean hasAccessToNetwork(User user, Network network) {
         return user.isAdmin() || userDAO.hasAccessToNetwork(user, network);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findGoogleUser(String login) {
         return userDAO.findByGoogleLogin(login);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findFacebookUser(String login) {
         return userDAO.findByFacebookLogin(login);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findGithubUser(String login) {
         return userDAO.findByGithubLogin(login);
     }

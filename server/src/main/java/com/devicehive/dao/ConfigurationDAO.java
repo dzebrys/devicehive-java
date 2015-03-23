@@ -2,26 +2,21 @@ package com.devicehive.dao;
 
 import com.devicehive.configuration.Constants;
 import com.devicehive.model.Configuration;
-import com.devicehive.util.LogExecutionTime;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
-import static com.devicehive.model.Configuration.Queries.Names.DELETE;
-import static com.devicehive.model.Configuration.Queries.Names.GET_ALL;
-import static com.devicehive.model.Configuration.Queries.Names.GET_BY_NAME;
+import static com.devicehive.model.Configuration.Queries.Names.*;
 import static com.devicehive.model.Configuration.Queries.Parameters.NAME;
 
-@Stateless
-@LogExecutionTime
+@Repository
+@Transactional
 public class ConfigurationDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -35,7 +30,6 @@ public class ConfigurationDAO {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public List<Configuration> findAll() {
         TypedQuery<Configuration> query = em.createNamedQuery(GET_ALL, Configuration.class);
         CacheHelper.cacheable(query);

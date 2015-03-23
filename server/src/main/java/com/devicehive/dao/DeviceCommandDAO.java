@@ -7,11 +7,10 @@ import com.devicehive.model.Device;
 import com.devicehive.model.DeviceCommand;
 import com.devicehive.model.Network;
 import com.devicehive.model.User;
-import com.devicehive.util.LogExecutionTime;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -26,8 +25,8 @@ import java.util.List;
 import static com.devicehive.model.DeviceCommand.Queries.Names.*;
 import static com.devicehive.model.DeviceCommand.Queries.Parameters.*;
 
-@Stateless
-@LogExecutionTime
+@Repository
+@Transactional
 public class DeviceCommandDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -57,12 +56,14 @@ public class DeviceCommandDAO {
         return query.executeUpdate();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
+
     public DeviceCommand findById(Long id) {
         return em.find(DeviceCommand.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
+
     public DeviceCommand getByDeviceGuidAndId(@NotNull String guid, @NotNull long id) {
         TypedQuery<DeviceCommand> query =
             em.createNamedQuery(GET_BY_DEVICE_UUID_AND_ID, DeviceCommand.class);
@@ -73,7 +74,7 @@ public class DeviceCommandDAO {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceCommand> findCommands(Collection<Device> devices, Collection<String> names,
                                             @NotNull Timestamp timestamp, HivePrincipal principal) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -94,7 +95,6 @@ public class DeviceCommandDAO {
         return query.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public List<DeviceCommand> queryDeviceCommand(Device device,
                                                   Timestamp start,
                                                   Timestamp end,

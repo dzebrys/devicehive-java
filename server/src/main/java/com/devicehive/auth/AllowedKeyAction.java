@@ -2,8 +2,6 @@ package com.devicehive.auth;
 
 import com.devicehive.model.AvailableActions;
 
-import javax.enterprise.util.Nonbinding;
-import javax.interceptor.InterceptorBinding;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,11 +12,10 @@ import static java.lang.annotation.ElementType.TYPE;
 
 @Target({METHOD, TYPE})
 @Inherited
-@InterceptorBinding
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AllowedKeyAction {
 
-    @Nonbinding
+
     public Action action() default Action.NONE;
 
     public static enum Action {

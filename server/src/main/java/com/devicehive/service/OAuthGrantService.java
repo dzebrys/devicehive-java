@@ -12,11 +12,9 @@ import com.devicehive.model.enums.Type;
 import com.devicehive.model.enums.UserStatus;
 import com.devicehive.model.updates.OAuthGrantUpdate;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
@@ -26,33 +24,33 @@ import java.util.UUID;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
-@Stateless
+@Service
 public class OAuthGrantService {
 
-    @EJB
+    @Autowired
     private OAuthGrantDAO grantDAO;
     private AccessKeyService accessKeyService;
     private OAuthClientService clientService;
     private UserService userService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
 
-    @EJB
+    @Autowired
     public void setAccessKeyService(AccessKeyService accessKeyService) {
         this.accessKeyService = accessKeyService;
     }
 
-    @EJB
+    @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
-    @EJB
+    @Autowired
     public void setClientService(OAuthClientService clientService) {
         this.clientService = clientService;
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public OAuthGrant get(@NotNull User user, @NotNull Long grantId) {
         if (user.isAdmin()) {
             return grantDAO.get(grantId);
@@ -141,7 +139,7 @@ public class OAuthGrantService {
         return existing;
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public List<OAuthGrant> list(@NotNull User user,
                                  Timestamp start,
                                  Timestamp end,
@@ -158,7 +156,7 @@ public class OAuthGrantService {
                             sortOrder, take, skip);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public OAuthGrant get(@NotNull String authCode, @NotNull String clientOAuthID) {
         return grantDAO.getByCodeAndOauthID(authCode, clientOAuthID);
     }
@@ -213,12 +211,12 @@ public class OAuthGrantService {
         return grant.getAccessKey();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     private void invalidate(OAuthGrant grant) {
         grant.setAuthCode(null);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     private void validate(OAuthGrant grant) {
         List<String> violations = new ArrayList<>();
         if (grant.getClient() == null) {

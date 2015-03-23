@@ -4,77 +4,49 @@ import com.devicehive.auth.HivePrincipal;
 import com.devicehive.configuration.Messages;
 import com.devicehive.dao.DeviceCommandDAO;
 import com.devicehive.exceptions.HiveException;
-import com.devicehive.messages.bus.Create;
-import com.devicehive.messages.bus.GlobalMessage;
-import com.devicehive.messages.bus.LocalMessage;
-import com.devicehive.messages.bus.Update;
+import com.devicehive.messages.bus.GlobalMessageBus;
 import com.devicehive.model.Device;
 import com.devicehive.model.DeviceCommand;
 import com.devicehive.model.User;
 import com.devicehive.model.updates.DeviceCommandUpdate;
 import com.devicehive.util.HiveValidator;
-import com.devicehive.util.LogExecutionTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 
-@Stateless
-@LogExecutionTime
+@Service
 public class DeviceCommandService {
 
-    @EJB
+    @Autowired
     private DeviceCommandDAO commandDAO;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @EJB
+    @Autowired
     private HiveValidator hiveValidator;
 
-    @Inject
-    @Create
-    @GlobalMessage
-    private Event<DeviceCommand> commandEventGlobal;
-
-    @Inject
-    @Create
-    @LocalMessage
-    private Event<DeviceCommand> commandEventLocal;
-
-    @Inject
-    @Update
-    @GlobalMessage
-    private Event<DeviceCommand> updateEventGlobal;
-
-    @Inject
-    @Update
-    @LocalMessage
-    private Event<DeviceCommand> updateEventLocal;
+    @Autowired
+    private GlobalMessageBus globalMessageBus;
 
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public DeviceCommand getByGuidAndId(@NotNull String guid, @NotNull long id) {
         return commandDAO.getByDeviceGuidAndId(guid, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public DeviceCommand findById(Long id) {
         return commandDAO.findById(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<DeviceCommand> getDeviceCommandsList(Collection<String> devices, Collection<String> names,
                                                      Timestamp timestamp,
                                                      HivePrincipal principal) {
@@ -87,7 +59,7 @@ public class DeviceCommandService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public List<DeviceCommand> queryDeviceCommand(Device device, Timestamp start, Timestamp end, String command,
                                                   String status, String sortField, Boolean sortOrderAsc,
                                                   Integer take, Integer skip, Integer gridInterval) {
@@ -101,8 +73,7 @@ public class DeviceCommandService {
 
     public void submitDeviceCommandUpdate(DeviceCommandUpdate update, Device device) {
         DeviceCommand saved = saveDeviceCommandUpdate(update, device);
-        updateEventGlobal.fire(saved);
-        updateEventLocal.fire(saved);
+        globalMessageBus.publishDeviceCommandUpdate(saved);
     }
 
     public void submitDeviceCommand(DeviceCommand command, Device device, User user) {
@@ -111,8 +82,7 @@ public class DeviceCommandService {
         command.setUserId(user.getId());
         command.setTimestamp(timestampService.getTimestamp());
         commandDAO.createCommand(command);
-        commandEventGlobal.fire(command);
-        commandEventLocal.fire(command);
+        globalMessageBus.publishDeviceCommand(command);
     }
 
     private DeviceCommand saveDeviceCommandUpdate(DeviceCommandUpdate update, Device device) {

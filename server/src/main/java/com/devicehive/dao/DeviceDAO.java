@@ -5,11 +5,10 @@ import com.devicehive.configuration.Constants;
 import com.devicehive.dao.filter.AccessKeyBasedFilterForDevices;
 import com.devicehive.model.Device;
 import com.devicehive.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -24,25 +23,25 @@ import static com.devicehive.model.Device.Queries.Names.*;
 import static com.devicehive.model.Device.Queries.Parameters.GUID;
 import static com.devicehive.model.Device.Queries.Parameters.KEY;
 
-@Stateless
-@EJB(beanInterface = DeviceDAO.class, name = "DeviceDAO")
+@Repository
+@Transactional
 public class DeviceDAO {
 
-    @EJB
+    @Autowired
     private NetworkDAO networkDAO;
 
-    @EJB
+    @Autowired
     private DeviceClassDAO deviceClassDAO;
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
     private EntityManager em;
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public Device findById(Long id) {
         return em.find(Device.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public Device findByUUIDWithNetworkAndDeviceClass(String uuid) {
         TypedQuery<Device> query = em.createNamedQuery(FIND_BY_UUID_WITH_NETWORK_AND_DEVICE_CLASS,
                                                        Device.class);
@@ -51,7 +50,7 @@ public class DeviceDAO {
         return res.isEmpty() ? null : res.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public Device findByUUIDAndKey(String uuid, String key) {
         TypedQuery<Device> query = em.createNamedQuery(FIND_BY_UUID_AND_KEY, Device.class);
         query.setParameter(GUID, uuid);
@@ -77,7 +76,7 @@ public class DeviceDAO {
         return query.executeUpdate() != 0;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public long getNumberOfAvailableDevices(HivePrincipal principal, List<String> guids) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteria = criteriaBuilder.createQuery(Long.class);
@@ -93,7 +92,7 @@ public class DeviceDAO {
         return query.getSingleResult();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<Device> getDeviceList(HivePrincipal principal, Collection<String> guids) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Device> criteria = criteriaBuilder.createQuery(Device.class);
@@ -108,7 +107,7 @@ public class DeviceDAO {
         return query.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<Device> getList(String name,
                                 String namePattern,
                                 String status,

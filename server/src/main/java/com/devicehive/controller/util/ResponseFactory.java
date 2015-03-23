@@ -3,21 +3,31 @@ package com.devicehive.controller.util;
 import com.devicehive.json.strategies.JsonPolicyApply;
 import com.devicehive.json.strategies.JsonPolicyDef;
 
-import java.lang.annotation.Annotation;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.lang.annotation.Annotation;
 
 public class ResponseFactory {
 
-    public static Response response(Response.Status status, Object entity, JsonPolicyDef.Policy policy) {
+    public static Response response(final Response.Status status, Object entity, final JsonPolicyDef.Policy policy) {
 
         Response.ResponseBuilder responseBuilder = Response.status(status);
 
         if (policy == null && entity != null) {
             responseBuilder.entity(entity);
         } else if (entity != null) {
-            Annotation[] annotations = {new JsonPolicyApply.JsonPolicyApplyLiteral(policy)};
+            Annotation[] annotations = {new JsonPolicyApply() {
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return JsonPolicyApply.class;
+                }
+
+                @Override
+                public JsonPolicyDef.Policy value() {
+                    return policy;
+                }
+            }};
             responseBuilder.entity(entity, annotations);
         }
 

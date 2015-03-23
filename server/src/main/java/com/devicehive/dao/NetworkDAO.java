@@ -8,10 +8,9 @@ import com.devicehive.exceptions.HiveException;
 import com.devicehive.model.AccessKeyPermission;
 import com.devicehive.model.Network;
 import com.devicehive.model.User;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -27,7 +26,8 @@ import static com.devicehive.model.Network.Queries.Names.*;
 import static com.devicehive.model.Network.Queries.Parameters.ID;
 import static com.devicehive.model.Network.Queries.Parameters.NAME;
 
-@Stateless
+@Repository
+@Transactional
 public class NetworkDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -38,7 +38,7 @@ public class NetworkDAO {
         return network;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public Network getWithDevicesAndDeviceClasses(@NotNull long id) {
         TypedQuery<Network> query = em.createNamedQuery(GET_WITH_DEVICES_AND_DEVICE_CLASSES, Network.class);
         query.setParameter(ID, id);
@@ -46,7 +46,7 @@ public class NetworkDAO {
         return result.isEmpty() ? null : result.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<Network> getNetworkList(@NotNull User user,
                                         Set<AccessKeyPermission> permissions,
                                         List<Long> networkIds) {
@@ -83,12 +83,11 @@ public class NetworkDAO {
         return query.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public Network getById(@NotNull long id) {
         return em.find(Network.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public Network findByName(@NotNull String name) {
         TypedQuery<Network> query = em.createNamedQuery(FIND_BY_NAME, Network.class);
         query.setParameter(NAME, name);
@@ -107,7 +106,7 @@ public class NetworkDAO {
         return query.executeUpdate() != 0;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<Network> list(String name,
                               String namePattern,
                               String sortField,
@@ -153,7 +152,6 @@ public class NetworkDAO {
         return resultQuery.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public Network getByIdWithUsers(@NotNull long id) {
         TypedQuery<Network> query = em.createNamedQuery(FIND_WITH_USERS, Network.class);
         query.setParameter(ID, id);

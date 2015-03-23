@@ -1,13 +1,10 @@
 package com.devicehive.messages.subscriptions;
 
 
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.Singleton;
+import org.springframework.stereotype.Service;
 
-import static javax.ejb.ConcurrencyManagementType.BEAN;
 
-@Singleton
-@ConcurrencyManagement(BEAN)
+@Service
 public class SubscriptionManager {
 
     private final CommandSubscriptionStorage commandSubscriptionStorage

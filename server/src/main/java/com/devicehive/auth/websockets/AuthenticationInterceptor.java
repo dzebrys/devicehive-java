@@ -1,40 +1,36 @@
 package com.devicehive.auth.websockets;
 
-import com.google.gson.JsonObject;
-
 import com.devicehive.auth.HivePrincipal;
 import com.devicehive.auth.HiveSecurityContext;
 import com.devicehive.model.Device;
 import com.devicehive.service.DeviceService;
 import com.devicehive.util.ThreadLocalVariablesKeeper;
 import com.devicehive.websockets.HiveWebsocketSessionState;
-import com.devicehive.websockets.handlers.annotations.WebsocketController;
-
+import com.google.gson.JsonObject;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
 import javax.websocket.Session;
 
 import static com.devicehive.configuration.Constants.DEVICE_ID;
 import static com.devicehive.configuration.Constants.DEVICE_KEY;
 
-@WebsocketController
-@Interceptor
-@Priority(Interceptor.Priority.APPLICATION)
-public class AuthenticationInterceptor {
+@Component
+public class AuthenticationInterceptor implements MethodInterceptor {
 
-    @Inject
+    @Autowired
     private DeviceService deviceService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
-    @AroundInvoke
-    public Object authenticate(InvocationContext ctx) throws Exception {
+
+
+    @Override
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         Session session = ThreadLocalVariablesKeeper.getSession();
         HiveWebsocketSessionState state = HiveWebsocketSessionState.get(session);
 
@@ -59,8 +55,8 @@ public class AuthenticationInterceptor {
         }
         hiveSecurityContext.setOrigin(state.getOrigin());
         hiveSecurityContext.setClientInetAddress(state.getClientInetAddress());
-        return ctx.proceed();
-
+        return methodInvocation.proceed();
     }
+
 
 }

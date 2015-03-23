@@ -9,44 +9,39 @@ import com.devicehive.model.Equipment;
 import com.devicehive.model.NullableWrapper;
 import com.devicehive.model.updates.DeviceClassUpdate;
 import com.devicehive.util.HiveValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.FORBIDDEN;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.*;
 
-@Stateless
+@Service
 public class DeviceClassService {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
     private EntityManager em;
 
-    @EJB
+    @Autowired
     private DeviceClassDAO deviceClassDAO;
-    @EJB
+    @Autowired
     private EquipmentService equipmentService;
-    @EJB
+    @Autowired
     private HiveValidator hiveValidator;
 
     public boolean delete(@NotNull long id) {
         return deviceClassDAO.delete(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public DeviceClass getWithEquipment(@NotNull long id) {
         return deviceClassDAO.getWithEquipment(id);
     }
@@ -204,7 +199,6 @@ public class DeviceClassService {
         return equipmentService.create(equipment);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<DeviceClass> getDeviceClassList(String name, String namePattern, String version, String sortField,
                                                 Boolean sortOrderAsc, Integer take, Integer skip) {
         return deviceClassDAO.getDeviceClassList(name, namePattern, version, sortField, sortOrderAsc, take, skip);

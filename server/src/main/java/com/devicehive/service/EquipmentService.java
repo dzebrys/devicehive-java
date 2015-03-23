@@ -5,26 +5,22 @@ import com.devicehive.model.DeviceClass;
 import com.devicehive.model.Equipment;
 import com.devicehive.model.updates.EquipmentUpdate;
 import com.devicehive.util.HiveValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * This class manages equipment in database. EquipmentDAO shouldn't be used directly from controller, please use this
  * class instead
  */
-@Stateless
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@Service
 public class EquipmentService {
 
-    @EJB
+    @Autowired
     private EquipmentDAO equipmentDAO;
-    @EJB
+    @Autowired
     private HiveValidator validationUtil;
 
     /**

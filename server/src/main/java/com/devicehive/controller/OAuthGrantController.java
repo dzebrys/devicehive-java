@@ -20,37 +20,36 @@ import com.devicehive.model.enums.Type;
 import com.devicehive.model.updates.OAuthGrantUpdate;
 import com.devicehive.service.OAuthGrantService;
 import com.devicehive.service.UserService;
-import com.devicehive.util.LogExecutionTime;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
 import java.util.List;
 
-import static com.devicehive.auth.AllowedKeyAction.Action.*;
+import static com.devicehive.auth.AllowedKeyAction.Action.MANAGE_OAUTH_GRANT;
 import static com.devicehive.configuration.Constants.*;
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.*;
 import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/user/{userId}/oauth/grant")
-@LogExecutionTime
+@Component
 public class OAuthGrantController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuthGrantController.class);
 
-    @EJB
+    @Autowired
     private OAuthGrantService grantService;
 
-    @EJB
+    @Autowired
     private UserService userService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
 

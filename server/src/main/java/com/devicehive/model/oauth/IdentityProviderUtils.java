@@ -11,8 +11,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import javax.ejb.Singleton;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,7 +24,7 @@ import static com.devicehive.configuration.Constants.UTF8;
 /**
  * Created by tmatvienko on 1/9/15.
  */
-@Singleton
+@Component
 public class IdentityProviderUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(IdentityProviderUtils.class);
 

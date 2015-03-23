@@ -15,27 +15,26 @@ import com.devicehive.service.DeviceService;
 import com.devicehive.service.IdentityProviderService;
 import com.devicehive.service.NetworkService;
 import com.devicehive.service.TimestampService;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
 
 /**
  * Created by tmatvienko on 11/21/14.
  */
-@Stateless
+@Component
 public class OAuthAuthenticationUtils {
 
-    @EJB
+    @Autowired
     private NetworkService networkService;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private IdentityProviderService identityProviderService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
 
     public AccessKey prepareAccessKey(final User user) {

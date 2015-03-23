@@ -1,28 +1,20 @@
 package com.devicehive.model;
 
 
-import com.google.gson.annotations.SerializedName;
-
 import com.devicehive.json.strategies.JsonPolicyDef;
 import com.devicehive.model.enums.UserRole;
 import com.devicehive.model.enums.UserStatus;
-
+import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.sql.Timestamp;
-import java.util.Set;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.ws.rs.DefaultValue;
+import java.sql.Timestamp;
+import java.util.Set;
 
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.COMMAND_TO_CLIENT;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.COMMAND_TO_DEVICE;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.USERS_LISTED;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.USER_PUBLISHED;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.USER_SUBMITTED;
+import static com.devicehive.json.strategies.JsonPolicyDef.Policy.*;
 import static com.devicehive.model.User.Queries.Names;
 import static com.devicehive.model.User.Queries.Values;
 

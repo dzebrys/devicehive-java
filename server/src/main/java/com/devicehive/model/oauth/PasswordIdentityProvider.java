@@ -10,24 +10,24 @@ import com.devicehive.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 
 /**
  * Created by tmatvienko on 1/13/15.
  */
-@Singleton
+@Component
 public class PasswordIdentityProvider extends AuthProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(PasswordIdentityProvider.class);
 
     private static final String PASSWORD_PROVIDER_NAME = "Password";
 
-    @EJB
+    @Autowired
     private UserService userService;
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
 
     @Override

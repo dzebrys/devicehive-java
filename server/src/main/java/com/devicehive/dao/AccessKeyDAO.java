@@ -3,10 +3,9 @@ package com.devicehive.dao;
 
 import com.devicehive.configuration.Constants;
 import com.devicehive.model.AccessKey;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -21,13 +20,13 @@ import java.util.List;
 import static com.devicehive.model.AccessKey.Queries.Names.*;
 import static com.devicehive.model.AccessKey.Queries.Parameters.*;
 
-@Stateless
+@Repository
+@Transactional
 public class AccessKeyDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
     private EntityManager em;
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public List<AccessKey> list(Long userId, String label,
                                 String labelPattern, Integer type,
                                 String sortField, Boolean sortOrderAsc,
@@ -76,7 +75,7 @@ public class AccessKeyDAO {
         return resultQuery.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public AccessKey get(Long userId, Long accessKeyId) {
         TypedQuery<AccessKey> query = em.createNamedQuery(GET_BY_ID, AccessKey.class);
         query.setParameter(USER_ID, userId);
@@ -85,7 +84,7 @@ public class AccessKeyDAO {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public AccessKey get(Long userId, String label) {
         TypedQuery<AccessKey> query = em.createNamedQuery(GET_BY_USER_AND_LABEL, AccessKey.class);
         query.setParameter(USER_ID, userId);
@@ -94,7 +93,7 @@ public class AccessKeyDAO {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public AccessKey getWithoutUser(Long userId, Long accessKeyId) {
         TypedQuery<AccessKey> query = em.createNamedQuery(GET_BY_ID_SIMPLE, AccessKey.class);
         query.setParameter(USER_ID, userId);
@@ -104,7 +103,6 @@ public class AccessKeyDAO {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public AccessKey get(String accessKey) {
         TypedQuery<AccessKey> query = em.createNamedQuery(GET_BY_KEY, AccessKey.class);
         query.setParameter(KEY, accessKey);

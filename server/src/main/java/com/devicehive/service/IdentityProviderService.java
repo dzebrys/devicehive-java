@@ -5,11 +5,9 @@ import com.devicehive.dao.IdentityProviderDAO;
 import com.devicehive.exceptions.HiveException;
 import com.devicehive.model.IdentityProvider;
 import com.devicehive.util.HiveValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.validation.constraints.NotNull;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -17,30 +15,28 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 /**
  * Created by tmatvienko on 11/17/14.
  */
-@Stateless
+@Service
 public class IdentityProviderService {
 
-    @EJB
+    @Autowired
     private IdentityProviderDAO identityProviderDAO;
-    @EJB
+    @Autowired
     private HiveValidator hiveValidator;
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public IdentityProvider find(@NotNull Long id) {
         return identityProviderDAO.get(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public IdentityProvider find(@NotNull String name) {
         return identityProviderDAO.get(name);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public boolean delete(@NotNull Long id) {
         return identityProviderDAO.delete(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public IdentityProvider update(@NotNull Long identityProviderId, IdentityProvider identityProvider) {
         IdentityProvider existing = find(identityProviderId);
         if (existing == null) {

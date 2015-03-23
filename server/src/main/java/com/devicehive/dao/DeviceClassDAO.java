@@ -2,13 +2,9 @@ package com.devicehive.dao;
 
 import com.devicehive.configuration.Constants;
 import com.devicehive.model.DeviceClass;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -18,26 +14,25 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.devicehive.model.DeviceClass.Queries.Names.DELETE_BY_ID;
-import static com.devicehive.model.DeviceClass.Queries.Names.FIND_BY_NAME_AND_VERSION;
-import static com.devicehive.model.DeviceClass.Queries.Names.GET_ALL;
-import static com.devicehive.model.DeviceClass.Queries.Names.GET_WITH_EQUIPMENT;
-import static com.devicehive.model.DeviceClass.Queries.Parameters.ID;
-import static com.devicehive.model.DeviceClass.Queries.Parameters.NAME;
-import static com.devicehive.model.DeviceClass.Queries.Parameters.VERSION;
+import static com.devicehive.model.DeviceClass.Queries.Names.*;
+import static com.devicehive.model.DeviceClass.Queries.Parameters.*;
 
 /**
  * TODO JavaDoc
  */
 
-@Stateless
+@Repository
+@Transactional
 public class DeviceClassDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
     private EntityManager em;
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
+
     public List<DeviceClass> getDeviceClassList(String name, String namePattern, String version, String sortField,
                                                 Boolean sortOrderAsc, Integer take, Integer skip) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -84,7 +79,6 @@ public class DeviceClassDAO {
         return query.executeUpdate() != 0;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public DeviceClass getWithEquipment(@NotNull long id) {
         TypedQuery<DeviceClass> tq = em.createNamedQuery(GET_WITH_EQUIPMENT, DeviceClass.class);
         tq.setParameter(ID, id);
@@ -92,12 +86,12 @@ public class DeviceClassDAO {
         return result.isEmpty() ? null : result.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceClass> getList() {
         return em.createNamedQuery(GET_ALL, DeviceClass.class).getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public DeviceClass getDeviceClass(@NotNull Long id) {
         return em.find(DeviceClass.class, id);
     }
@@ -117,7 +111,7 @@ public class DeviceClassDAO {
         return em.merge(deviceClass);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public DeviceClass getDeviceClassByNameAndVersion(String name, String version) {
         TypedQuery<DeviceClass> query = em.createNamedQuery(FIND_BY_NAME_AND_VERSION, DeviceClass.class);
         query.setParameter(VERSION, version);

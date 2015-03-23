@@ -3,10 +3,8 @@ package com.devicehive.exceptions;
 
 import com.devicehive.configuration.Messages;
 
-import javax.ejb.ApplicationException;
 import javax.servlet.http.HttpServletResponse;
 
-@ApplicationException
 public class HiveException extends RuntimeException {
 
     private static final long serialVersionUID = 6413354755792688308L;

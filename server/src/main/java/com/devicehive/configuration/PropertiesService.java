@@ -2,10 +2,9 @@ package com.devicehive.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -13,8 +12,7 @@ import java.util.Properties;
 /**
  * Created by tmatvienko on 11/19/14.
  */
-@Startup
-@Singleton
+@Service
 public class PropertiesService {
 
     private static final String PROPERTIES = "/app.properties";

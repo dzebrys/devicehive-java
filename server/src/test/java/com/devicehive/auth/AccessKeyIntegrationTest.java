@@ -16,6 +16,7 @@ import com.devicehive.model.JsonStringWrapper;
 import com.devicehive.model.User;
 import com.devicehive.model.enums.UserRole;
 import com.devicehive.model.enums.UserStatus;
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +24,6 @@ import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.interceptor.InvocationContext;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -68,7 +68,7 @@ public class AccessKeyIntegrationTest {
     private UserDAO userDAO;
     private RequestInterceptor interceptor = new RequestInterceptor();
     @Mock
-    private InvocationContext context;
+    private MethodInvocation context;
     private int methodCalls;
 
     @Before
@@ -96,7 +96,7 @@ public class AccessKeyIntegrationTest {
     }
 
     @Test
-    public void actionsCaseAllowed() {
+    public void actionsCaseAllowed() throws Throwable {
         /**
          * Only actions field is not null
          */
@@ -158,7 +158,7 @@ public class AccessKeyIntegrationTest {
     }
 
     @Test
-    public void actionsCaseNotAllowed() throws Exception {
+    public void actionsCaseNotAllowed() throws Throwable {
         /**
          * Only actions field is not null
          */
@@ -225,18 +225,18 @@ public class AccessKeyIntegrationTest {
         assertEquals(methodCalls, exceptionsCounter);
     }
 
-    private void actionTestProcess(AccessKey accessKey, String actions) throws Exception {
+    private void actionTestProcess(AccessKey accessKey, String actions) throws Throwable {
         Set<AccessKeyPermission> permissions = new HashSet<>();
         AccessKeyPermission permission = new AccessKeyPermission();
         permission.setAccessKey(accessKey);
         permission.setActions(new JsonStringWrapper(actions));
         permissions.add(permission);
         accessKey.setPermissions(permissions);
-        interceptor.checkPermissions(context);
+        interceptor.invoke(context);
     }
 
     @Test
-    public void subnetsCaseAllowed() {
+    public void subnetsCaseAllowed() throws Throwable {
         /**
          * Only subnets field and actions field are not null
          */
@@ -266,7 +266,7 @@ public class AccessKeyIntegrationTest {
     }
 
     @Test
-    public void subnetsCaseNotAllowed() {
+    public void subnetsCaseNotAllowed() throws Throwable {
         /**
          * Only subnets field and actions field are not null
          */
@@ -304,7 +304,7 @@ public class AccessKeyIntegrationTest {
         assertEquals(exceptionsCounter, methodCalls);
     }
 
-    private void subnetsTestProcess(AccessKey accessKey, String action) throws Exception {
+    private void subnetsTestProcess(AccessKey accessKey, String action) throws Throwable {
         Set<AccessKeyPermission> permissions = new HashSet<>();
         AccessKeyPermission permission = new AccessKeyPermission();
         permission.setAccessKey(accessKey);
@@ -313,11 +313,11 @@ public class AccessKeyIntegrationTest {
         permission.setActions(new JsonStringWrapper(action));
         permissions.add(permission);
         accessKey.setPermissions(permissions);
-        interceptor.checkPermissions(context);
+        interceptor.invoke(context);
     }
 
     @Test
-    public void domainsCaseAllowed() {
+    public void domainsCaseAllowed() throws Throwable {
         /**
          * Only subnets field and actions field are not null
          */
@@ -347,7 +347,7 @@ public class AccessKeyIntegrationTest {
     }
 
     @Test
-    public void domainsCaseNotAllowed() {
+    public void domainsCaseNotAllowed() throws Throwable {
         /**
          * Only domains field and actions field are not null
          */
@@ -385,7 +385,7 @@ public class AccessKeyIntegrationTest {
         assertEquals(exceptionsCounter, methodCalls);
     }
 
-    private void domainsTestProcess(AccessKey accessKey, String action) throws Exception {
+    private void domainsTestProcess(AccessKey accessKey, String action) throws Throwable {
         Set<AccessKeyPermission> permissions = new HashSet<>();
         AccessKeyPermission permission = new AccessKeyPermission();
         permission.setAccessKey(accessKey);
@@ -394,7 +394,7 @@ public class AccessKeyIntegrationTest {
         permission.setActions(new JsonStringWrapper(action));
         permissions.add(permission);
         accessKey.setPermissions(permissions);
-        interceptor.checkPermissions(context);
+        interceptor.invoke(context);
     }
 }
 

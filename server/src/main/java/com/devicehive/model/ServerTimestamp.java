@@ -2,16 +2,9 @@ package com.devicehive.model;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 import static com.devicehive.model.ServerTimestamp.Queries.Names;
 import static com.devicehive.model.ServerTimestamp.Queries.Values;

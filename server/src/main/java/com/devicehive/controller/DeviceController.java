@@ -13,17 +13,16 @@ import com.devicehive.model.*;
 import com.devicehive.model.updates.DeviceUpdate;
 import com.devicehive.service.DeviceEquipmentService;
 import com.devicehive.service.DeviceService;
-import com.devicehive.util.LogExecutionTime;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
@@ -43,18 +42,18 @@ import static javax.ws.rs.core.Response.Status.*;
  * RESTful API: Device</a> for details.
  */
 @Path("/device")
-@LogExecutionTime
+@Component
 public class DeviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceController.class);
 
-    @EJB
+    @Autowired
     private DeviceEquipmentService deviceEquipmentService;
 
-    @EJB
+    @Autowired
     private DeviceService deviceService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
 

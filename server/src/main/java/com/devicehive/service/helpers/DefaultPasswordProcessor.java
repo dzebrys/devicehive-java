@@ -1,7 +1,6 @@
 package com.devicehive.service.helpers;
 
 import com.devicehive.configuration.Constants;
-
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.UnsupportedEncodingException;

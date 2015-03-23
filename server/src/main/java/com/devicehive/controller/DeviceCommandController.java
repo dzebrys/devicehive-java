@@ -23,16 +23,13 @@ import com.devicehive.model.updates.DeviceCommandUpdate;
 import com.devicehive.service.DeviceCommandService;
 import com.devicehive.service.DeviceService;
 import com.devicehive.service.TimestampService;
-import com.devicehive.util.LogExecutionTime;
 import com.devicehive.util.ParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.enterprise.concurrent.ManagedExecutorService;
-import javax.inject.Inject;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
@@ -43,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 import static com.devicehive.auth.AllowedKeyAction.Action.*;
 import static com.devicehive.configuration.Constants.*;
@@ -54,21 +52,23 @@ import static javax.ws.rs.core.Response.Status.*;
  * details.
  */
 @Path("/device")
-@LogExecutionTime
+@Component
 public class DeviceCommandController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceCommandController.class);
-    @EJB
+    @Autowired
     private DeviceCommandService commandService;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private SubscriptionManager subscriptionManager;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @Resource(name = "concurrent/DeviceHiveWaitService")
-    private ManagedExecutorService mes;
-    @Inject
+
+    @Autowired
+    private ExecutorService mes;
+
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     /**

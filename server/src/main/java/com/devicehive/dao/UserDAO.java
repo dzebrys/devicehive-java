@@ -5,12 +5,10 @@ import com.devicehive.model.Device;
 import com.devicehive.model.Network;
 import com.devicehive.model.User;
 import com.devicehive.service.helpers.PasswordProcessor;
-import com.devicehive.util.LogExecutionTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -27,13 +25,13 @@ import java.util.List;
 import static com.devicehive.model.User.Queries.Names.*;
 import static com.devicehive.model.User.Queries.Parameters.*;
 
-@Stateless
-@LogExecutionTime
+@Repository
+@Transactional
 public class UserDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
     private EntityManager em;
-    @Inject
+    @Autowired
     private PasswordProcessor passwordService;
 
     /**
@@ -42,7 +40,7 @@ public class UserDAO {
      * @param login user's login
      * @return User or null, if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findByLogin(String login) {
         TypedQuery<User> query = em.createNamedQuery(FIND_BY_NAME, User.class);
         query.setParameter(LOGIN, login);
@@ -57,7 +55,7 @@ public class UserDAO {
      * @param login user's login
      * @return User or null, if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findByGoogleLogin(String login) {
         TypedQuery<User> query = em.createNamedQuery(FIND_BY_GOOGLE_NAME, User.class);
         query.setParameter(LOGIN, login);
@@ -72,7 +70,7 @@ public class UserDAO {
      * @param login user's login
      * @return User or null, if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findByFacebookLogin(String login) {
         TypedQuery<User> query = em.createNamedQuery(FIND_BY_FACEBOOK_NAME, User.class);
         query.setParameter(LOGIN, login);
@@ -87,7 +85,7 @@ public class UserDAO {
      * @param login user's login
      * @return User or null, if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findByGithubLogin(String login) {
         TypedQuery<User> query = em.createNamedQuery(FIND_BY_GITHUB_NAME, User.class);
         query.setParameter(LOGIN, login);
@@ -104,7 +102,7 @@ public class UserDAO {
      * @param githubLogin user's github login
      * @return User or null, if there is no such user
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findByIdentityLogin(String login, String googleLogin, String facebookLogin, String githubLogin) {
         TypedQuery<User> query = em.createNamedQuery(FIND_BY_IDENTITY_NAME, User.class);
         query.setParameter(LOGIN, login);
@@ -128,7 +126,6 @@ public class UserDAO {
      * @param skip         like SQL OFFSET
      * @return List of User
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public List<User> getList(String login, String loginPattern, Integer role, Integer status, String sortField,
                               Boolean sortOrderAsc, Integer take, Integer skip) {
 
@@ -178,12 +175,12 @@ public class UserDAO {
         return resultQuery.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findById(Long id) {
         return em.find(User.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public User findUserWithNetworks(Long id) {
         TypedQuery<User> query = em.createNamedQuery(GET_WITH_NETWORKS_BY_ID, User.class);
         query.setParameter(ID, id);
@@ -192,7 +189,7 @@ public class UserDAO {
 
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public boolean hasAccessToNetwork(User user, Network network) {
         TypedQuery<Long> query = em.createNamedQuery(HAS_ACCESS_TO_NETWORK, Long.class);
         query.setParameter(USER, user);
@@ -201,7 +198,6 @@ public class UserDAO {
         return count != null && count > 0;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public boolean hasAccessToDevice(User user, Device device) {
         TypedQuery<Long> query = em.createNamedQuery(HAS_ACCESS_TO_DEVICE, Long.class);
         query.setParameter(USER, user);

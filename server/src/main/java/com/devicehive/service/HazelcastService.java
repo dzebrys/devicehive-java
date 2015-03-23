@@ -3,25 +3,15 @@ package com.devicehive.service;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import java.util.Set;
 
-import static javax.ejb.ConcurrencyManagementType.BEAN;
-
-@Singleton
-@ConcurrencyManagement(BEAN)
-@Startup
+@Service
 public class HazelcastService {
 
     private static final Logger logger = LoggerFactory.getLogger(HazelcastService.class);
@@ -51,7 +41,7 @@ public class HazelcastService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public HazelcastInstance getHazelcast() {
         return hazelcast;
     }

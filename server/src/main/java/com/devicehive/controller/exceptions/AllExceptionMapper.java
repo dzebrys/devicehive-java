@@ -2,11 +2,9 @@ package com.devicehive.controller.exceptions;
 
 import com.devicehive.controller.util.ResponseFactory;
 import com.devicehive.model.ErrorResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.EJBException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotAllowedException;
 import javax.ws.rs.NotFoundException;
@@ -42,8 +40,6 @@ public class AllExceptionMapper implements ExceptionMapper<Exception> {
             WebApplicationException realException = (WebApplicationException) exception;
             int response = realException.getResponse().getStatus();
             responseCode = Response.Status.fromStatusCode(response);
-        } else if (exception instanceof EJBException) {
-            message = ((EJBException) exception).getCausedByException().getLocalizedMessage();
         }
         return ResponseFactory.response(responseCode, new ErrorResponse(responseCode.getStatusCode(), message));
     }

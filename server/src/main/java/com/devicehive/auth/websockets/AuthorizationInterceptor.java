@@ -5,31 +5,28 @@ import com.devicehive.auth.HivePrincipal;
 import com.devicehive.auth.HiveRoles;
 import com.devicehive.auth.HiveSecurityContext;
 import com.devicehive.exceptions.HiveException;
-import com.devicehive.websockets.handlers.annotations.WebsocketController;
-
-import java.lang.reflect.Method;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Priority;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
 import javax.ws.rs.core.Response;
-
-@Interceptor
-@WebsocketController
-@Priority(Interceptor.Priority.APPLICATION + 200)
-public class AuthorizationInterceptor {
+import java.lang.reflect.Method;
 
 
-    @Inject
+@Component
+public class AuthorizationInterceptor implements MethodInterceptor {
+
+
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
-    @AroundInvoke
-    public Object authorize(InvocationContext context) throws Exception {
-        Method method = context.getMethod();
+    @Override
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+        Method method = methodInvocation.getMethod();
         boolean allowed = false;
         HivePrincipal principal = hiveSecurityContext.getHivePrincipal();
         if (method.isAnnotationPresent(RolesAllowed.class)) {
@@ -60,7 +57,7 @@ public class AuthorizationInterceptor {
             throw new HiveException(Response.Status.FORBIDDEN.getReasonPhrase(),
                                     Response.Status.FORBIDDEN.getStatusCode());
         }
-        return context.proceed();
+        return methodInvocation.proceed();
     }
 
 }

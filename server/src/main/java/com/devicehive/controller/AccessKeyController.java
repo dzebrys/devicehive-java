@@ -17,13 +17,12 @@ import com.devicehive.model.enums.UserRole;
 import com.devicehive.model.updates.AccessKeyUpdate;
 import com.devicehive.service.AccessKeyService;
 import com.devicehive.service.UserService;
-import com.devicehive.util.LogExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -38,18 +37,18 @@ import static javax.ws.rs.core.Response.Status.*;
  * RESTful API: AccessKey</a> for details.
  */
 @Path("/user/{userId}/accesskey")
-@LogExecutionTime
+@Component
 public class AccessKeyController {
 
     private static Logger logger = LoggerFactory.getLogger(AccessKeyController.class);
 
-    @EJB
+    @Autowired
     private UserService userService;
 
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     /**

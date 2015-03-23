@@ -2,11 +2,13 @@ package com.devicehive.auth;
 
 import com.devicehive.model.OAuthClient;
 import com.devicehive.model.enums.UserRole;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import javax.enterprise.context.RequestScoped;
 import java.net.InetAddress;
 
-@RequestScoped
+@Component
+@Scope("request")
 public class HiveSecurityContext {
 
 

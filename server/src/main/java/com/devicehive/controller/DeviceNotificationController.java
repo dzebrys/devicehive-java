@@ -24,16 +24,13 @@ import com.devicehive.model.response.NotificationPollManyResponse;
 import com.devicehive.service.DeviceNotificationService;
 import com.devicehive.service.DeviceService;
 import com.devicehive.service.TimestampService;
-import com.devicehive.util.LogExecutionTime;
 import com.devicehive.util.ParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.enterprise.concurrent.ManagedExecutorService;
-import javax.inject.Inject;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
@@ -44,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 import static com.devicehive.auth.AllowedKeyAction.Action.CREATE_DEVICE_NOTIFICATION;
 import static com.devicehive.auth.AllowedKeyAction.Action.GET_DEVICE_NOTIFICATION;
@@ -59,23 +57,24 @@ import static javax.ws.rs.core.Response.Status.*;
  * @author rroschin
  */
 @Path("/device")
-@LogExecutionTime
+@Component
 public class DeviceNotificationController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceNotificationController.class);
-    @EJB
+    @Autowired
     private DeviceNotificationService notificationService;
-    @EJB
+    @Autowired
     private SubscriptionManager subscriptionManager;
-    @EJB
+    @Autowired
     private DeviceNotificationService deviceNotificationService;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @Resource(name = "concurrent/DeviceHiveWaitService")
-    private ManagedExecutorService mes;
-    @Inject
+
+    @Autowired
+    private ExecutorService mes;
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     /**

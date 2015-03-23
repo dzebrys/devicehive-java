@@ -7,17 +7,9 @@ import com.devicehive.model.Device;
 import com.devicehive.model.DeviceNotification;
 import com.devicehive.model.Network;
 import com.devicehive.model.User;
-import com.devicehive.util.LogExecutionTime;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -27,9 +19,14 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-@Stateless
-@LogExecutionTime
+@Repository
+@Transactional
 public class DeviceNotificationDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -41,12 +38,11 @@ public class DeviceNotificationDAO {
         return deviceNotification;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public DeviceNotification findById(@NotNull long id) {
         return em.find(DeviceNotification.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceNotification> findNotifications(Collection<Device> devices, Collection<String> names,
                                                       @NotNull Timestamp timestamp, HivePrincipal principal) {
         if (devices != null && devices.isEmpty()) {
@@ -101,7 +97,7 @@ public class DeviceNotificationDAO {
      synchronously with the adding of the wildcards.
      2) Query parameters are set with query.setParameter(int position, Object value) to avoid sql injection.
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceNotification> queryDeviceNotification(Device device,
                                                             Timestamp start,
                                                             Timestamp end,

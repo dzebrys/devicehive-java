@@ -10,48 +10,40 @@ import com.devicehive.messages.subscriptions.SubscriptionManager;
 import com.devicehive.model.Device;
 import com.devicehive.service.DeviceActivityService;
 import com.devicehive.websockets.HiveWebsocketSessionState;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import javax.websocket.CloseReason;
+import javax.websocket.MessageHandler;
+import javax.websocket.PongMessage;
+import javax.websocket.Session;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Asynchronous;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.EJB;
-import javax.ejb.Schedule;
-import javax.ejb.Singleton;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.websocket.CloseReason;
-import javax.websocket.MessageHandler;
-import javax.websocket.PongMessage;
-import javax.websocket.Session;
 
-import static javax.ejb.ConcurrencyManagementType.BEAN;
 
-@Singleton
-@ConcurrencyManagement(BEAN)
-@EJB(name = "SessionMonitor", beanInterface = SessionMonitor.class)
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+@Component
 public class SessionMonitor {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionMonitor.class);
     private ConcurrentMap<String, Session> sessionMap;
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private DeviceActivityService deviceActivityService;
-    @EJB
+    @Autowired
     private SubscriptionManager subscriptionManager;
 
-    @EJB
+    @Autowired
     private SessionMonitor self;
 
     public void registerSession(final Session session) {
@@ -91,7 +83,8 @@ public class SessionMonitor {
         }
     }
 
-    @Schedule(hour = "*", minute = "*", second = "*/30", persistent = false)
+    //@Schedule(hour = "*", minute = "*", second = "*/30", persistent = false)
+    //TODO
     public synchronized void ping() {
         for (Session session : sessionMap.values()) {
             if (session.isOpen()) {
@@ -110,7 +103,7 @@ public class SessionMonitor {
     }
 
 
-    @Asynchronous
+    @Async
     public void closePing(Session session) {
         try {
             session.close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, Messages.PING_ERROR));

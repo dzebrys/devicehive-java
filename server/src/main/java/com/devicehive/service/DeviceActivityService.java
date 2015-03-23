@@ -4,35 +4,23 @@ import com.devicehive.configuration.Constants;
 import com.devicehive.dao.DeviceDAO;
 import com.devicehive.model.Device;
 import com.devicehive.model.DeviceClass;
-import com.devicehive.util.LogExecutionTime;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.EJB;
-import javax.ejb.Schedule;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 
-@Singleton
-@Startup
-@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-@EJB(beanInterface = DeviceActivityService.class, name = "DeviceActivityService")
-@LogExecutionTime
+@Service
 public class DeviceActivityService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceActivityService.class);
 
-    @EJB
+    @Autowired
     private HazelcastService hazelcastService;
-    @EJB
+    @Autowired
     private DeviceDAO deviceDAO;
 
     private HazelcastInstance hazelcast;
@@ -48,8 +36,7 @@ public class DeviceActivityService {
         deviceTimestampMap.putAsync(deviceId, hazelcast.getCluster().getClusterTime());
     }
 
-    @Schedule(hour = "*", minute = "*/5", persistent = false)
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    //@Schedule(hour = "*", minute = "*/5", persistent = false)
     public void processOfflineDevices() {
         logger.debug("Checking lost offline devices");
         long now = hazelcast.getCluster().getClusterTime();

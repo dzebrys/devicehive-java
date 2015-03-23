@@ -4,8 +4,9 @@ package com.devicehive.dao;
 import com.devicehive.configuration.Constants;
 import com.devicehive.model.AccessKey;
 import com.devicehive.model.AccessKeyPermission;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -13,7 +14,8 @@ import javax.persistence.Query;
 import static com.devicehive.model.AccessKeyPermission.Queries.Names.DELETE_BY_ACCESS_KEY;
 import static com.devicehive.model.AccessKeyPermission.Queries.Parameters.ACCESS_KEY;
 
-@Stateless
+@Repository
+@Transactional
 public class AccessKeyPermissionDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)

@@ -6,10 +6,9 @@ import com.devicehive.model.AccessKey;
 import com.devicehive.model.OAuthClient;
 import com.devicehive.model.OAuthGrant;
 import com.devicehive.model.User;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -22,7 +21,8 @@ import java.util.List;
 import static com.devicehive.model.OAuthGrant.Queries.Names.*;
 import static com.devicehive.model.OAuthGrant.Queries.Parameters.*;
 
-@Stateless
+@Repository
+@Transactional
 public class OAuthGrantDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -33,7 +33,7 @@ public class OAuthGrantDAO {
         return toInsert;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public OAuthGrant get(User user, Long grantId) {
         TypedQuery<OAuthGrant> query = em.createNamedQuery(GET_BY_ID_AND_USER, OAuthGrant.class);
         query.setParameter(GRANT_ID, grantId);
@@ -42,7 +42,7 @@ public class OAuthGrantDAO {
         return result.isEmpty() ? null : result.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public OAuthGrant get(Long grantId) {
         TypedQuery<OAuthGrant> query = em.createNamedQuery(GET_BY_ID, OAuthGrant.class);
         query.setParameter(GRANT_ID, grantId);
@@ -63,7 +63,7 @@ public class OAuthGrantDAO {
         return query.executeUpdate() != 0;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<OAuthGrant> get(User user,
                                 Timestamp start,
                                 Timestamp end,
@@ -134,7 +134,7 @@ public class OAuthGrantDAO {
         return resultQuery.getResultList();
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public OAuthGrant getByCodeAndOauthID(String authCode, String oauthId) {
         TypedQuery<OAuthGrant> query = em.createNamedQuery(GET_BY_CODE_AND_OAUTH_ID, OAuthGrant.class);
         query.setParameter(AUTH_CODE, authCode);

@@ -1,43 +1,30 @@
 package com.devicehive.websockets.util;
 
-import com.google.gson.JsonElement;
-
 import com.devicehive.json.GsonFactory;
-import com.devicehive.util.LogExecutionTime;
 import com.devicehive.websockets.HiveWebsocketSessionState;
-
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
+import javax.websocket.Session;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.ejb.Asynchronous;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.event.Observes;
-import javax.websocket.Session;
 
-
-@Singleton
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class AsyncMessageSupplier {
+@Component
+public class AsyncMessageSupplier implements ApplicationListener<FlushQueueEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncMessageSupplier.class);
 
 
-    @EJB
-    private AsyncMessageSupplier self;
-
-
-    @LogExecutionTime
-    @Asynchronous
-    public void deliverMessages(@Observes @FlushQueue Session session) throws IOException {
+    @Async
+    public void onApplicationEvent(FlushQueueEvent event) {
+        Session session = event.getSession();
         ConcurrentLinkedQueue<JsonElement> queue = HiveWebsocketSessionState.get(session).getQueue();
         boolean acquired = false;
         try {
@@ -61,6 +48,8 @@ public class AsyncMessageSupplier {
                     logger.debug("Session {}: {} messages left", session.getId(), queue.size());
                 }
             }
+        } catch (IOException ex) {
+            logger.error("Error messages delivery to session {}",session.getId(), ex);
         } finally {
             if (acquired) {
                 HiveWebsocketSessionState.get(session).getQueueLock().unlock();

@@ -21,10 +21,10 @@ import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -35,24 +35,24 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 /**
  * Created by tmatvienko on 1/9/15.
  */
-@Singleton
+@Component
 public class GoogleAuthProvider extends AuthProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleAuthProvider.class);
 
     private static final String GOOGLE_PROVIDER_NAME = "Google";
     private IdentityProvider identityProvider;
 
-    @EJB
+    @Autowired
     private IdentityProviderService identityProviderService;
-    @EJB
+    @Autowired
     private PropertiesService propertiesService;
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private UserService userService;
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
-    @EJB
+    @Autowired
     private IdentityProviderUtils identityProviderUtils;
 
     @PostConstruct

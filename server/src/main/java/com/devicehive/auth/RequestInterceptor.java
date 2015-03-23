@@ -6,37 +6,32 @@ import com.devicehive.model.AccessKeyPermission;
 import com.devicehive.model.User;
 import com.devicehive.model.enums.UserStatus;
 import com.devicehive.util.ThreadLocalVariablesKeeper;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.Set;
 
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
-@Interceptor
-@AllowedKeyAction
-@Priority(Interceptor.Priority.APPLICATION + 300)
-public class RequestInterceptor {
+
+public class RequestInterceptor implements MethodInterceptor {
 
     private static Logger logger = LoggerFactory.getLogger(RequestInterceptor.class);
 
 
     private HiveSecurityContext hiveSecurityContext;
 
-    @Inject
+    @Autowired
     public void setHiveSecurityContext(HiveSecurityContext hiveSecurityContext) {
         this.hiveSecurityContext = hiveSecurityContext;
     }
 
-    @AroundInvoke
-    public Object checkPermissions(InvocationContext context) throws Exception {
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         try {
             HivePrincipal principal = hiveSecurityContext.getHivePrincipal();
             User user = principal.getUser();
@@ -45,7 +40,7 @@ public class RequestInterceptor {
             }
             AccessKey key = principal.getKey();
             if (key == null) {
-                return context.proceed();
+                return methodInvocation.proceed();
             }
             if (key.getUser() == null || !key.getUser().getStatus().equals(UserStatus.ACTIVE)) {
                 throw new HiveException(UNAUTHORIZED.getReasonPhrase(), UNAUTHORIZED.getStatusCode());
@@ -54,7 +49,7 @@ public class RequestInterceptor {
             if (expirationDate != null && expirationDate.before(new Timestamp(System.currentTimeMillis()))) {
                 throw new HiveException(UNAUTHORIZED.getReasonPhrase(), UNAUTHORIZED.getStatusCode());
             }
-            Method method = context.getMethod();
+            Method method = methodInvocation.getMethod();
             AllowedKeyAction allowedActionAnnotation = method.getAnnotation(AllowedKeyAction.class);
             Set<AccessKeyPermission>
                 filtered =
@@ -65,7 +60,7 @@ public class RequestInterceptor {
                 throw new HiveException(UNAUTHORIZED.getReasonPhrase(), UNAUTHORIZED.getStatusCode());
             }
             key.setPermissions(filtered);
-            return context.proceed();
+            return methodInvocation.proceed();
         } finally {
             ThreadLocalVariablesKeeper.clean();
         }

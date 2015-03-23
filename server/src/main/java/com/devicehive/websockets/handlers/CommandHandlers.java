@@ -25,66 +25,45 @@ import com.devicehive.websockets.converters.WebSocketResponse;
 import com.devicehive.websockets.handlers.annotations.Action;
 import com.devicehive.websockets.handlers.annotations.WsParam;
 import com.devicehive.websockets.util.AsyncMessageSupplier;
-import com.devicehive.websockets.util.FlushQueue;
+import com.devicehive.websockets.util.FlushQueueEvent;
 import com.devicehive.websockets.util.SubscriptionSessionMap;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ApplicationEventMulticaster;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import javax.websocket.Session;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.*;
 
-import static com.devicehive.auth.AllowedKeyAction.Action.CREATE_DEVICE_COMMAND;
-import static com.devicehive.auth.AllowedKeyAction.Action.GET_DEVICE_COMMAND;
-import static com.devicehive.auth.AllowedKeyAction.Action.UPDATE_DEVICE_COMMAND;
-import static com.devicehive.configuration.Constants.COMMAND;
-import static com.devicehive.configuration.Constants.COMMAND_ID;
-import static com.devicehive.configuration.Constants.DEVICE_GUID;
-import static com.devicehive.configuration.Constants.DEVICE_GUIDS;
-import static com.devicehive.configuration.Constants.NAMES;
-import static com.devicehive.configuration.Constants.SUBSCRIPTION;
-import static com.devicehive.configuration.Constants.SUBSCRIPTION_ID;
-import static com.devicehive.configuration.Constants.TIMESTAMP;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.COMMAND_FROM_CLIENT;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.COMMAND_TO_CLIENT;
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.REST_COMMAND_UPDATE_FROM_DEVICE;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static com.devicehive.auth.AllowedKeyAction.Action.*;
+import static com.devicehive.configuration.Constants.*;
+import static com.devicehive.json.strategies.JsonPolicyDef.Policy.*;
+import static javax.servlet.http.HttpServletResponse.*;
 
 
 public class CommandHandlers extends WebsocketHandlers {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandHandlers.class);
-    @EJB
+    @Autowired
     private SubscriptionManager subscriptionManager;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private DeviceCommandService commandService;
-    @EJB
+    @Autowired
     private AsyncMessageSupplier asyncMessageDeliverer;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @EJB
+    @Autowired
     private SubscriptionSessionMap subscriptionSessionMap;
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
-    @Inject
-    @FlushQueue
-    private Event<Session> event;
+    @Autowired
+    private ApplicationEventMulticaster multicaster;
 
     public static String createAccessDeniedForGuidsMessage(List<String> guids,
                                                            List<Device> allowedDevices) {
@@ -172,7 +151,7 @@ public class CommandHandlers extends WebsocketHandlers {
                     csList.add(new CommandSubscription(principal, d.getId(),
                                                        reqId,
                                                        names,
-                                                       WebsocketHandlerCreator.createCommandInsert(session)
+                                                       WebsocketHandlerCreator.createCommandInsert(session, multicaster)
                     ));
                 }
             } else {
@@ -181,7 +160,7 @@ public class CommandHandlers extends WebsocketHandlers {
                                             Constants.NULL_ID_SUBSTITUTE,
                                             reqId,
                                             names,
-                                            WebsocketHandlerCreator.createCommandInsert(session)
+                                            WebsocketHandlerCreator.createCommandInsert(session, multicaster)
                     );
                 csList.add(forAll);
             }
@@ -202,7 +181,7 @@ public class CommandHandlers extends WebsocketHandlers {
         } finally {
             HiveWebsocketSessionState.get(session).getCommandSubscriptionsLock().unlock();
             logger.debug("deliver messages process for session" + session.getId());
-            asyncMessageDeliverer.deliverMessages(session);
+            multicaster.multicastEvent(new FlushQueueEvent(session));
         }
     }
 
@@ -243,7 +222,7 @@ public class CommandHandlers extends WebsocketHandlers {
         } finally {
             state.getCommandSubscriptionsLock().unlock();
             logger.debug("deliver messages process for session" + session.getId());
-            event.fire(session);
+            multicaster.multicastEvent(new FlushQueueEvent(session));
         }
         logger.debug("command/unsubscribe completed for session {}", session.getId());
         return new WebSocketResponse();

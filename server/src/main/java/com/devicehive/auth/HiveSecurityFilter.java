@@ -13,8 +13,8 @@ import com.google.common.base.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -32,15 +32,15 @@ import static com.devicehive.configuration.Constants.UTF8;
 public class HiveSecurityFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSecurityFilter.class);
-    @Inject
+    @Autowired
     private DeviceService deviceService;
-    @Inject
+    @Autowired
     private UserService userService;
-    @Inject
+    @Autowired
     private AccessKeyService accessKeyService;
-    @Inject
+    @Autowired
     private OAuthClientService clientService;
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     @Override

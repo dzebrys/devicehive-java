@@ -12,11 +12,9 @@ import com.devicehive.exceptions.HiveException;
 import com.devicehive.model.*;
 import com.devicehive.model.updates.NetworkUpdate;
 import com.devicehive.util.HiveValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,27 +23,27 @@ import java.util.Set;
 
 import static javax.ws.rs.core.Response.Status.*;
 
-@Stateless
+@Service
 public class NetworkService {
 
     public static final String ALLOW_NETWORK_AUTO_CREATE = "allowNetworkAutoCreate";
 
-    @EJB
+    @Autowired
     private NetworkDAO networkDAO;
-    @EJB
+    @Autowired
     private UserService userService;
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
-    @EJB
+    @Autowired
     private AccessKeyDAO accessKeyDAO;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private HiveValidator hiveValidator;
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public Network getWithDevicesAndDeviceClasses(@NotNull Long networkId,
                                                   @NotNull HiveSecurityContext hiveSecurityContext) {
         HivePrincipal principal = hiveSecurityContext.getHivePrincipal();
@@ -98,7 +96,7 @@ public class NetworkService {
         return networkDAO.createNetwork(newNetwork);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public Network update(@NotNull Long networkId, NetworkUpdate networkUpdate) {
         Network existing = getById(networkId);
         if (existing == null) {
@@ -117,7 +115,7 @@ public class NetworkService {
         return networkDAO.updateNetwork(existing);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public List<Network> list(String name,
                               String namePattern,
                               String sortField,
@@ -128,7 +126,7 @@ public class NetworkService {
         return networkDAO.list(name, namePattern, sortField, sortOrder, take, skip, principal);
     }
 
-    @TransactionAttribute
+
     public Network createOrVeriryNetwork(NullableWrapper<Network> network) {
         Network stored;
         //case network is not defined
@@ -161,7 +159,7 @@ public class NetworkService {
         return stored;
     }
 
-    @TransactionAttribute
+
     public Network createOrUpdateNetworkByUser(NullableWrapper<Network> network, User user) {
         Network stored;
 
@@ -200,7 +198,6 @@ public class NetworkService {
         return stored;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public Network createOrVeriryNetworkByKey(NullableWrapper<Network> network, AccessKey key) {
         Network stored;
 

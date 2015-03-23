@@ -41,7 +41,7 @@ public class AccessKeyCommonTest {
     };
 
     @Test
-    public void userStatusTest() throws Exception {
+    public void userStatusTest() throws Throwable {
         AccessKey key = new AccessKey();
         ADMIN.setStatus(UserStatus.DISABLED);
         key.setUser(ADMIN);
@@ -51,7 +51,7 @@ public class AccessKeyCommonTest {
         interceptor.setHiveSecurityContext(hiveSecurityContext);
         Exception thrown = null;
         try {
-            interceptor.checkPermissions(null);
+            interceptor.invoke(null);
         } catch (Exception e) {
             thrown = e;
             if (e instanceof HiveException) {
@@ -74,7 +74,7 @@ public class AccessKeyCommonTest {
         interceptor.setHiveSecurityContext(hiveSecurityContext);
         thrown = null;
         try {
-            interceptor.checkPermissions(null);
+            interceptor.invoke(null);
         } catch (Exception e) {
             thrown = e;
             if (e instanceof HiveException) {
@@ -97,7 +97,7 @@ public class AccessKeyCommonTest {
         interceptor.setHiveSecurityContext(hiveSecurityContext);
         thrown = null;
         try {
-            interceptor.checkPermissions(null);
+            interceptor.invoke(null);
         } catch (Exception e) {
             thrown = e;
             if (e instanceof HiveException) {
@@ -113,7 +113,7 @@ public class AccessKeyCommonTest {
     }
 
     @Test
-    public void expirationDateTest() {
+    public void expirationDateTest() throws Throwable {
         AccessKey key = new AccessKey();
         CLIENT.setStatus(UserStatus.ACTIVE);
         key.setUser(CLIENT);
@@ -124,7 +124,7 @@ public class AccessKeyCommonTest {
         RequestInterceptor interceptor = new RequestInterceptor();
         interceptor.setHiveSecurityContext(hiveSecurityContext);
         try {
-            interceptor.checkPermissions(null);
+            interceptor.invoke(null);
         } catch (Exception e) {
             if (e instanceof HiveException) {
                 HiveException hiveException = (HiveException) e;

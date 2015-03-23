@@ -1,16 +1,14 @@
 package com.devicehive.websockets.converters;
 
 
-import com.google.gson.JsonObject;
-
 import com.devicehive.json.GsonFactory;
-
-import java.io.IOException;
-import java.io.Writer;
+import com.google.gson.JsonObject;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
+import java.io.IOException;
+import java.io.Writer;
 
 public class JsonEncoder implements Encoder.TextStream<JsonObject> {
 

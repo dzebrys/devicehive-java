@@ -6,22 +6,18 @@ import com.devicehive.model.DeviceEquipment;
 import com.devicehive.model.DeviceNotification;
 import com.devicehive.model.SpecialNotifications;
 import com.devicehive.util.ServerResponsesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.validation.constraints.NotNull;
-
-//TODO:javadoc
-@Stateless
+@Service
 public class DeviceEquipmentService {
 
-    @EJB
+    @Autowired
     private DeviceEquipmentDAO deviceEquipmentDAO;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
 
 
@@ -31,12 +27,12 @@ public class DeviceEquipmentService {
      * @param device Equipment will be fetched for this device
      * @return List of DeviceEquipment for specified device
      */
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceEquipment> findByFK(@NotNull Device device) {
         return deviceEquipmentDAO.findByFK(device);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public DeviceEquipment findByCodeAndDevice(@NotNull String code, @NotNull Device device) {
         return deviceEquipmentDAO.findByCodeAndDevice(code, device);
     }
@@ -48,7 +44,7 @@ public class DeviceEquipmentService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+
     public DeviceNotification refreshDeviceEquipment(DeviceNotification notification, Device device) {
         DeviceEquipment deviceEquipment = null;
         if (notification.getNotification().equals(SpecialNotifications.EQUIPMENT)) {

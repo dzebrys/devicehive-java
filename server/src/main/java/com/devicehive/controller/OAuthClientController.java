@@ -12,14 +12,13 @@ import com.devicehive.model.ErrorResponse;
 import com.devicehive.model.OAuthClient;
 import com.devicehive.model.updates.OAuthClientUpdate;
 import com.devicehive.service.OAuthClientService;
-import com.devicehive.util.LogExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -30,15 +29,15 @@ import static com.devicehive.json.strategies.JsonPolicyDef.Policy.*;
 import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/oauth/client")
-@LogExecutionTime
+@Component
 public class OAuthClientController {
 
     private static final Logger logger = LoggerFactory.getLogger(OAuthClientController.class);
 
-    @EJB
+    @Autowired
     private OAuthClientService clientService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
 

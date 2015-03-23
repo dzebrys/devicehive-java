@@ -23,34 +23,22 @@ import com.devicehive.websockets.converters.WebSocketResponse;
 import com.devicehive.websockets.handlers.annotations.Action;
 import com.devicehive.websockets.handlers.annotations.WsParam;
 import com.devicehive.websockets.util.AsyncMessageSupplier;
-import com.devicehive.websockets.util.FlushQueue;
+import com.devicehive.websockets.util.FlushQueueEvent;
 import com.devicehive.websockets.util.SubscriptionSessionMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ApplicationEventMulticaster;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import javax.websocket.Session;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.*;
 
 import static com.devicehive.auth.AllowedKeyAction.Action.CREATE_DEVICE_NOTIFICATION;
 import static com.devicehive.auth.AllowedKeyAction.Action.GET_DEVICE_NOTIFICATION;
-import static com.devicehive.configuration.Constants.DEVICE_GUID;
-import static com.devicehive.configuration.Constants.DEVICE_GUIDS;
-import static com.devicehive.configuration.Constants.NAMES;
-import static com.devicehive.configuration.Constants.NOTIFICATION;
-import static com.devicehive.configuration.Constants.SUBSCRIPTION_ID;
-import static com.devicehive.configuration.Constants.TIMESTAMP;
+import static com.devicehive.configuration.Constants.*;
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.NOTIFICATION_FROM_DEVICE;
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.NOTIFICATION_TO_DEVICE;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -60,23 +48,22 @@ import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 public class NotificationHandlers extends WebsocketHandlers {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationHandlers.class);
-    @EJB
+    @Autowired
     private SubscriptionManager subscriptionManager;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private DeviceNotificationService deviceNotificationService;
-    @EJB
+    @Autowired
     private AsyncMessageSupplier asyncMessageDeliverer;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @EJB
+    @Autowired
     private SubscriptionSessionMap subscriptionSessionMap;
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
-    @Inject
-    @FlushQueue
-    private Event<Session> event;
+    @Autowired
+    private ApplicationEventMulticaster multicaster;
 
     @Action(value = "notification/subscribe")
     @RolesAllowed({HiveRoles.ADMIN, HiveRoles.CLIENT, HiveRoles.KEY})
@@ -143,7 +130,7 @@ public class NotificationHandlers extends WebsocketHandlers {
                     nsList.add(new NotificationSubscription(principal, d.getId(),
                                                             reqId,
                                                             names,
-                                                            WebsocketHandlerCreator.createNotificationInsert(session)
+                                                            WebsocketHandlerCreator.createNotificationInsert(session, multicaster)
                     ));
                 }
             } else {
@@ -152,7 +139,7 @@ public class NotificationHandlers extends WebsocketHandlers {
                                                  Constants.NULL_ID_SUBSTITUTE,
                                                  reqId,
                                                  names,
-                                                 WebsocketHandlerCreator.createNotificationInsert(session)
+                                                 WebsocketHandlerCreator.createNotificationInsert(session, multicaster)
                     );
                 nsList.add(forAll);
             }
@@ -176,7 +163,7 @@ public class NotificationHandlers extends WebsocketHandlers {
         } finally {
             state.getNotificationSubscriptionsLock().unlock();
             logger.debug("deliver messages process for session" + session.getId());
-            asyncMessageDeliverer.deliverMessages(session);
+            multicaster.multicastEvent(new FlushQueueEvent(session));
         }
     }
 
@@ -225,7 +212,7 @@ public class NotificationHandlers extends WebsocketHandlers {
         } finally {
             state.getNotificationSubscriptionsLock().unlock();
             logger.debug("deliver messages process for session" + session.getId());
-            event.fire(session);
+            multicaster.multicastEvent(new FlushQueueEvent(session));
         }
         logger.debug("notification/unsubscribe completed for session {}", session.getId());
         return new WebSocketResponse();

@@ -2,10 +2,9 @@ package com.devicehive.dao;
 
 import com.devicehive.configuration.Constants;
 import com.devicehive.model.IdentityProvider;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -22,7 +21,8 @@ import static com.devicehive.model.IdentityProvider.Queries.Parameters.NAME;
 /**
  * Created by tmatvienko on 11/17/14.
  */
-@Stateless
+@Repository
+@Transactional
 public class IdentityProviderDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -33,12 +33,11 @@ public class IdentityProviderDAO {
         return newIdentityProvider;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public IdentityProvider get(Long id) {
         return em.find(IdentityProvider.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public IdentityProvider get(String name) {
         TypedQuery<IdentityProvider> query = em.createNamedQuery(GET_BY_NAME,
                 IdentityProvider.class);

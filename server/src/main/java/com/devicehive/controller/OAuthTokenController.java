@@ -11,13 +11,12 @@ import com.devicehive.model.OAuthClient;
 import com.devicehive.service.AccessKeyService;
 import com.devicehive.service.OAuthGrantService;
 import com.devicehive.service.TimestampService;
-import com.devicehive.util.LogExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.PermitAll;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -31,23 +30,23 @@ import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/oauth2/token")
 @Consumes(APPLICATION_FORM_URLENCODED)
-@LogExecutionTime
+@Component
 public class OAuthTokenController {
 
     private static final Logger logger = LoggerFactory.getLogger(OAuthTokenController.class);
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String PASSWORD = "password";
 
-    @EJB
+    @Autowired
     private OAuthGrantService grantService;
 
-    @EJB
+    @Autowired
     private TimestampService timestampService;
 
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     @POST

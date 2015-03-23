@@ -2,26 +2,21 @@ package com.devicehive.util;
 
 
 import com.devicehive.exceptions.HiveException;
-
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.ws.rs.core.Response;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-
-@Stateless
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@Service
 public class HiveValidator {
 
-    @Inject
+    @Autowired
     private Validator validator;
 
     /**
@@ -34,7 +29,7 @@ public class HiveValidator {
         Set<ConstraintViolation<?>> violations = new HashSet<ConstraintViolation<?>>(validator.validate(object));
         if (!violations.isEmpty()) {
             String response = buildMessage(violations);
-            throw new HiveException(response, BAD_REQUEST.getStatusCode());
+            throw new HiveException(response, Response.Status.BAD_REQUEST.getStatusCode());
         }
     }
 

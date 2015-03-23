@@ -14,11 +14,11 @@ import com.devicehive.model.oauth.*;
 import com.devicehive.model.updates.AccessKeyUpdate;
 import com.devicehive.service.helpers.AccessKeyProcessor;
 import com.devicehive.service.helpers.OAuthAuthenticationUtils;
-import com.devicehive.util.LogExecutionTime;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.ejb.*;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
@@ -29,35 +29,35 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Stateless
-@LogExecutionTime
-@EJB(beanInterface = AccessKeyService.class, name = "AccessKeyService")
+
+
+@Service
 public class AccessKeyService {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AccessKeyService.class);
 
-    @EJB
+    @Autowired
     private AccessKeyDAO accessKeyDAO;
-    @EJB
+    @Autowired
     private AccessKeyPermissionDAO permissionDAO;
-    @EJB
+    @Autowired
     private UserService userService;
-    @EJB
+    @Autowired
     private DeviceDAO deviceDAO;
-    @EJB
+    @Autowired
     private AccessKeyService self;
-    @EJB
+    @Autowired
     private OAuthAuthenticationUtils authenticationUtils;
-    @EJB
+    @Autowired
     private GoogleAuthProvider googleAuthProvider;
-    @EJB
+    @Autowired
     private FacebookAuthProvider facebookAuthProvider;
-    @EJB
+    @Autowired
     private GithubAuthProvider githubAuthProvider;
-    @EJB
+    @Autowired
     private PasswordIdentityProvider passwordIdentityProvider;
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -157,7 +157,7 @@ public class AccessKeyService {
         return createExternalAccessToken(user);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     private AccessKey createExternalAccessToken(final User user) {
         AccessKey accessKey = authenticationUtils.prepareAccessKey(user);
 
@@ -172,7 +172,7 @@ public class AccessKeyService {
         return accessKey;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public AccessKey find(@NotNull Long keyId, @NotNull Long userId) {
         return accessKeyDAO.get(userId, keyId);
     }
@@ -190,7 +190,7 @@ public class AccessKeyService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public boolean hasAccessToNetwork(AccessKey accessKey, Network targetNetwork) {
         Set<AccessKeyPermission> permissions = accessKey.getPermissions();
         Set<Long> allowedNetworks = new HashSet<>();
@@ -216,7 +216,7 @@ public class AccessKeyService {
                (user.isAdmin() || user.getNetworks().contains(targetNetwork));
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public boolean hasAccessToDevice(AccessKey accessKey, String deviceGuid) {
         Set<AccessKeyPermission> permissions = accessKey.getPermissions();
         Set<String> allowedDevices = new HashSet<>();
@@ -312,7 +312,7 @@ public class AccessKeyService {
         return existing;
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public List<AccessKey> list(Long userId, String label,
                                 String labelPattern, Integer type,
                                 String sortField, Boolean sortOrderAsc,
@@ -324,7 +324,7 @@ public class AccessKeyService {
         return accessKeyDAO.get(userId, keyId);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public boolean delete(Long userId, @NotNull Long keyId) {
         if (userId == null) {
             return accessKeyDAO.delete(keyId);
@@ -352,8 +352,6 @@ public class AccessKeyService {
         return newPermission;
     }
 
-    @Schedule(dayOfWeek = "Sun", hour = "0", persistent = false)
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void removeExpiredKeys() {
         LOGGER.debug("Removing expired access keys");
         accessKeyDAO.deleteOlderThan(timestampService.getTimestamp());

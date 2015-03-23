@@ -7,58 +7,40 @@ import com.devicehive.dao.DeviceNotificationDAO;
 import com.devicehive.exceptions.HiveException;
 import com.devicehive.messages.bus.Create;
 import com.devicehive.messages.bus.GlobalMessage;
+import com.devicehive.messages.bus.GlobalMessageBus;
 import com.devicehive.messages.bus.LocalMessage;
 import com.devicehive.model.Device;
 import com.devicehive.model.DeviceNotification;
 import com.devicehive.model.SpecialNotifications;
-import com.devicehive.util.LogExecutionTime;
 import com.devicehive.util.ServerResponsesFactory;
-
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
+import java.sql.Timestamp;
+import java.util.*;
 
-@Stateless
-@LogExecutionTime
+@Service
 public class DeviceNotificationService {
 
-    @EJB
+    @Autowired
     private DeviceNotificationDAO deviceNotificationDAO;
-    @EJB
+    @Autowired
     private DeviceEquipmentService deviceEquipmentService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @EJB
+    @Autowired
     private DeviceDAO deviceDAO;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
 
-    @Inject
-    @Create
-    @LocalMessage
-    private Event<DeviceNotification> eventLocal;
-
-    @Inject
-    @Create
-    @GlobalMessage
-    private Event<DeviceNotification> eventGlobal;
+    @Autowired
+    private GlobalMessageBus globalMessageBus;
 
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceNotification> getDeviceNotificationList(Collection<String> devices, Collection<String> names,
                                                               Timestamp timestamp,
                                                               HivePrincipal principal) {
@@ -84,12 +66,12 @@ public class DeviceNotificationService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public DeviceNotification findById(@NotNull long id) {
         return deviceNotificationDAO.findById(id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<DeviceNotification> queryDeviceNotification(Device device,
                                                             Timestamp start,
                                                             Timestamp end,
@@ -117,8 +99,7 @@ public class DeviceNotificationService {
     public void submitDeviceNotification(DeviceNotification notification, Device device) {
         List<DeviceNotification> proceedNotifications = processDeviceNotification(notification, device);
         for (DeviceNotification currentNotification : proceedNotifications) {
-            eventGlobal.fire(currentNotification);
-            eventLocal.fire(currentNotification);
+            globalMessageBus.publishDeviceNotification(currentNotification);
         }
     }
 

@@ -19,12 +19,11 @@ import com.devicehive.websockets.converters.WebSocketResponse;
 import com.devicehive.websockets.handlers.annotations.Action;
 import com.devicehive.websockets.handlers.annotations.WsParam;
 import com.devicehive.websockets.util.HiveEndpoint;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
-import javax.ejb.EJB;
 import javax.websocket.Session;
 
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.WEBSOCKET_SERVER_INFO;
@@ -33,15 +32,15 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 public class CommonHandlers extends WebsocketHandlers {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonHandlers.class);
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
-    @EJB
+    @Autowired
     private TimestampService timestampService;
-    @EJB
+    @Autowired
     private UserService userService;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
 
     /**

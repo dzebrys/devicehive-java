@@ -9,12 +9,11 @@ import com.devicehive.model.AccessKey;
 import com.devicehive.model.AccessKeyRequest;
 import com.devicehive.model.oauth.IdentityProviderEnum;
 import com.devicehive.service.AccessKeyService;
-import com.devicehive.util.LogExecutionTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -30,12 +29,12 @@ import static javax.ws.rs.core.Response.Status.OK;
  * Created by tmatvienko on 12/2/14.
  */
 @Path("/auth/accesskey")
-@LogExecutionTime
+@Component
 public class AuthAccessKeyController {
 
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     @POST

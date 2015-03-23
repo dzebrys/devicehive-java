@@ -12,31 +12,31 @@ import com.devicehive.model.ErrorResponse;
 import com.devicehive.model.Network;
 import com.devicehive.model.updates.NetworkUpdate;
 import com.devicehive.service.NetworkService;
-import com.devicehive.util.LogExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-import static com.devicehive.auth.AllowedKeyAction.Action.*;
+import static com.devicehive.auth.AllowedKeyAction.Action.GET_NETWORK;
+import static com.devicehive.auth.AllowedKeyAction.Action.MANAGE_NETWORK;
 import static com.devicehive.configuration.Constants.*;
 import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/network")
-@LogExecutionTime
+@Component
 public class NetworkController {
 
     private static final Logger logger = LoggerFactory.getLogger(NetworkController.class);
 
-    @EJB
+    @Autowired
     private NetworkService networkService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
 

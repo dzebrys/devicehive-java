@@ -1,9 +1,5 @@
 package com.devicehive.websockets.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-
 import com.devicehive.auth.HiveRoles;
 import com.devicehive.auth.HiveSecurityContext;
 import com.devicehive.configuration.Constants;
@@ -20,20 +16,19 @@ import com.devicehive.service.DeviceService;
 import com.devicehive.websockets.converters.WebSocketResponse;
 import com.devicehive.websockets.handlers.annotations.Action;
 import com.devicehive.websockets.handlers.annotations.WsParam;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.websocket.Session;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.devicehive.json.strategies.JsonPolicyDef.Policy.DEVICE_PUBLISHED;
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.DEVICE_PUBLISHED_DEVICE_AUTH;
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.DEVICE_SUBMITTED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -41,12 +36,12 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 public class DeviceHandlers extends WebsocketHandlers {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceHandlers.class);
-    @EJB
+    @Autowired
     private DeviceDAO deviceDAO;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
 
-    @Inject
+    @Autowired
     private HiveSecurityContext hiveSecurityContext;
 
     /**

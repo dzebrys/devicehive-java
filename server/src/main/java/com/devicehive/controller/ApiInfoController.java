@@ -10,12 +10,12 @@ import com.devicehive.model.ApiConfig;
 import com.devicehive.model.ApiInfo;
 import com.devicehive.model.IdentityProviderConfig;
 import com.devicehive.service.TimestampService;
-import com.devicehive.util.LogExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.PermitAll;
-import javax.ejb.EJB;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -26,18 +26,18 @@ import java.util.Set;
  * Provide API information
  */
 @Path("/info")
-@LogExecutionTime
+@Component
 public class ApiInfoController {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiInfoController.class);
 
-    @EJB
+    @Autowired
     private TimestampService timestampService;
 
-    @EJB
+    @Autowired
     private ConfigurationService configurationService;
 
-    @EJB
+    @Autowired
     private PropertiesService propertiesService;
 
     @GET

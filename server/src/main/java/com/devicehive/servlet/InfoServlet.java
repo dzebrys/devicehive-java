@@ -3,8 +3,8 @@ package com.devicehive.servlet;
 import com.devicehive.configuration.ConfigurationService;
 import com.devicehive.configuration.Constants;
 import com.devicehive.configuration.PropertiesService;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,12 +20,12 @@ public class InfoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -4886819685195322L;
 
-    @EJB
+    @Autowired
     private transient ConfigurationService configurationService;
 
     private static final String INFO_PAGE = "info_page.jsp";
 
-    @EJB
+    @Autowired
     PropertiesService propertiesService;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

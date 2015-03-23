@@ -6,34 +6,18 @@ import com.devicehive.messages.bus.listener.DeviceNotificationCreateListener;
 import com.devicehive.model.DeviceCommand;
 import com.devicehive.model.DeviceNotification;
 import com.devicehive.service.HazelcastService;
-import com.devicehive.util.LogExecutionTime;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Asynchronous;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-
-import static javax.ejb.ConcurrencyManagementType.BEAN;
 
 
-@Singleton
-@ConcurrencyManagement(BEAN)
-@Startup
-@LogExecutionTime
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+@Service
 public class GlobalMessageBus {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalMessageBus.class);
@@ -41,7 +25,7 @@ public class GlobalMessageBus {
     private static final String DEVICE_COMMAND_UPDATE = "DEVICE_COMMAND_UPDATE";
     private static final String DEVICE_NOTIFICATION = "DEVICE_NOTIFICATION";
 
-    @EJB
+    @Autowired
     private HazelcastService hazelcastService;
 
     private HazelcastInstance hazelcast;
@@ -50,13 +34,13 @@ public class GlobalMessageBus {
     private String notificationListener;
 
 
-    @Inject
+    @Autowired
     private DeviceCommandCreateListener deviceCommandCreateListener;
 
-    @Inject
+    @Autowired
     private DeviceCommandUpdateListener deviceCommandUpdateListener;
 
-    @Inject
+    @Autowired
     private DeviceNotificationCreateListener deviceNotificationCreateListener;
 
     @PostConstruct
@@ -86,29 +70,22 @@ public class GlobalMessageBus {
         hazelcast.getTopic(DEVICE_NOTIFICATION).removeMessageListener(notificationListener);
     }
 
-    @Asynchronous
-    public void publishDeviceCommand(@Observes(during = TransactionPhase.AFTER_SUCCESS)
-                                     @GlobalMessage @Create
-                                     DeviceCommand deviceCommand) {
+
+    public void publishDeviceCommand(DeviceCommand deviceCommand) {
         logger.debug("Sending device command {}", deviceCommand.getId());
         hazelcast.getTopic(DEVICE_COMMAND).publish(deviceCommand);
         logger.debug("Sent");
     }
 
-    @Asynchronous
-    public void publishDeviceCommandUpdate(
-        @Observes(during = TransactionPhase.AFTER_SUCCESS)
-        @GlobalMessage @Update
-        DeviceCommand deviceCommandUpdate) {
+
+    public void publishDeviceCommandUpdate(DeviceCommand deviceCommandUpdate) {
         logger.debug("Sending device command update {}", deviceCommandUpdate.getId());
         hazelcast.getTopic(DEVICE_COMMAND_UPDATE).publish(deviceCommandUpdate);
         logger.debug("Sent");
     }
 
-    @Asynchronous
-    public void publishDeviceNotification(
-        @GlobalMessage @Create
-        @Observes(during = TransactionPhase.AFTER_SUCCESS) DeviceNotification deviceNotification) {
+
+    public void publishDeviceNotification(DeviceNotification deviceNotification) {
         logger.debug("Sending device notification {}", deviceNotification.getId());
         hazelcast.getTopic(DEVICE_NOTIFICATION).publish(deviceNotification);
         logger.debug("Sent");

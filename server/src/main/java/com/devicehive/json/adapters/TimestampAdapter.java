@@ -1,13 +1,11 @@
 package com.devicehive.json.adapters;
 
 
+import com.devicehive.configuration.Messages;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
-import com.devicehive.configuration.Messages;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

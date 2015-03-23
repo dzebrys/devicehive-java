@@ -1,28 +1,21 @@
 package com.devicehive.websockets.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.websocket.Session;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.websocket.Session;
-
-import static javax.ejb.ConcurrencyManagementType.BEAN;
-
 /**
  * Created by stas on 06.05.14.
  */
-@Singleton
-@ConcurrencyManagement(BEAN)
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+@Component
 public class SubscriptionSessionMap {
 
-    @EJB
+    @Autowired
     private SessionMonitor sessionMonitor;
 
     private ConcurrentMap<UUID, String> map = new ConcurrentHashMap<>();

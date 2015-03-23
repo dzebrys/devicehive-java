@@ -8,66 +8,46 @@ import com.devicehive.dao.DeviceDAO;
 import com.devicehive.exceptions.HiveException;
 import com.devicehive.messages.bus.Create;
 import com.devicehive.messages.bus.GlobalMessage;
+import com.devicehive.messages.bus.GlobalMessageBus;
 import com.devicehive.messages.bus.LocalMessage;
-import com.devicehive.model.AccessKey;
-import com.devicehive.model.Device;
-import com.devicehive.model.DeviceClass;
-import com.devicehive.model.DeviceNotification;
-import com.devicehive.model.Equipment;
-import com.devicehive.model.Network;
-import com.devicehive.model.SpecialNotifications;
-import com.devicehive.model.User;
+import com.devicehive.model.*;
 import com.devicehive.model.updates.DeviceUpdate;
 import com.devicehive.util.HiveValidator;
-import com.devicehive.util.LogExecutionTime;
 import com.devicehive.util.ServerResponsesFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
 import static javax.ws.rs.core.Response.Status.*;
 
-@Stateless
-@LogExecutionTime
-@EJB(beanInterface = DeviceService.class, name = "DeviceService")
+@Service
 public class DeviceService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceService.class);
-    @EJB
+    @Autowired
     private DeviceNotificationService deviceNotificationService;
-    @EJB
+    @Autowired
     private DeviceDAO deviceDAO;
-    @EJB
+    @Autowired
     private NetworkService networkService;
-    @EJB
+    @Autowired
     private UserService userService;
-    @EJB
+    @Autowired
     private DeviceClassService deviceClassService;
-    @EJB
+    @Autowired
     private DeviceActivityService deviceActivityService;
-    @EJB
+    @Autowired
     private AccessKeyService accessKeyService;
-    @EJB
+    @Autowired
     private HiveValidator hiveValidator;
-    @Inject
-    @Create
-    @LocalMessage
-    private Event<DeviceNotification> eventLocal;
 
-    @Inject
-    @Create
-    @GlobalMessage
-    private Event<DeviceNotification> eventGlobal;
+    @Autowired
+    private GlobalMessageBus globalMessageBus;
 
     public void deviceSaveAndNotify(DeviceUpdate device, Set<Equipment> equipmentSet,
                                     HivePrincipal principal) {
@@ -95,8 +75,7 @@ public class DeviceService {
         } else {
             dn = deviceSave(device, equipmentSet);
         }
-        eventLocal.fire(dn);
-        eventGlobal.fire(dn);
+        globalMessageBus.publishDeviceNotification(dn);
         deviceActivityService.update(dn.getDevice().getId());
     }
 
@@ -301,13 +280,12 @@ public class DeviceService {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public Device findByGuidWithPermissionsCheck(String guid, HivePrincipal principal) {
         List<Device> result = findByGuidWithPermissionsCheck(Arrays.asList(guid), principal);
         return result.isEmpty() ? null : result.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<Device> findByGuidWithPermissionsCheck(Collection<String> guids, HivePrincipal principal) {
         return deviceDAO.getDeviceList(principal, guids);
     }
@@ -317,7 +295,7 @@ public class DeviceService {
      *
      * @param device device to check
      */
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public void validateDevice(DeviceUpdate device) throws HiveException {
         if (device == null) {
             throw new HiveException(Messages.EMPTY_DEVICE);
@@ -334,7 +312,7 @@ public class DeviceService {
         hiveValidator.validate(device);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public Device getDeviceWithNetworkAndDeviceClass(String deviceId, HivePrincipal principal) {
 
         if (getAllowedDevicesCount(principal, Arrays.asList(deviceId)) == 0) {
@@ -349,7 +327,7 @@ public class DeviceService {
         return device;
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public Device authenticate(String uuid, String key) {
         Device device = deviceDAO.findByUUIDAndKey(uuid, key);
         if (device != null) {
@@ -363,7 +341,7 @@ public class DeviceService {
         return existing.isEmpty() || deviceDAO.deleteDevice(guid);
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+
     public List<Device> getList(String name,
                                 String namePattern,
                                 String status,
@@ -382,19 +360,18 @@ public class DeviceService {
             deviceClassVersion, sortField, sortOrderAsc, take, skip, principal);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<Device> getList(Long networkId,
                                 HivePrincipal principal) {
         return deviceDAO
             .getList(null, null, null, networkId, null, null, null, null, null, null, null, null, principal);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public long getAllowedDevicesCount(HivePrincipal principal, List<String> guids) {
         return deviceDAO.getNumberOfAvailableDevices(principal, guids);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public Map<Device, Set<String>> createFilterMap(@NotNull Map<String, Set<String>> requested,
                                                     HivePrincipal principal) {
 
@@ -422,7 +399,6 @@ public class DeviceService {
         return result;
     }
 
-    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public boolean hasAccessTo(@NotNull HivePrincipal filtered, @NotNull Device device) {
         if (filtered.getDevice() != null) {
             return filtered.getDevice().getId().equals(device.getId());

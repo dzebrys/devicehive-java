@@ -9,44 +9,42 @@ import com.devicehive.messages.subscriptions.SubscriptionManager;
 import com.devicehive.model.DeviceCommand;
 import com.devicehive.model.DeviceNotification;
 import com.devicehive.service.DeviceService;
-import com.devicehive.util.LogExecutionTime;
 import com.devicehive.websockets.util.SessionMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.ejb.*;
-import javax.enterprise.concurrent.ManagedExecutorService;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
 import javax.websocket.Session;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
-import static javax.ejb.ConcurrencyManagementType.BEAN;
 
 
-@Singleton
-@ConcurrencyManagement(BEAN)
-@LogExecutionTime
-@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+@Service
 public class LocalMessageBus {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalMessageBus.class);
-    @EJB
+    @Autowired
     private SubscriptionManager subscriptionManager;
-    @EJB
+    @Autowired
     private DeviceService deviceService;
-    @EJB
+    @Autowired
     private SessionMonitor sessionMonitor;
-    @Resource(name = "concurrent/DeviceHiveMessageService")
-    private ManagedExecutorService mes;
 
-    @Asynchronous
-    public void submitDeviceCommand(@LocalMessage @Create
-                                    @Observes(
-                                        during = TransactionPhase.AFTER_SUCCESS) final DeviceCommand deviceCommand) {
+    @Autowired
+    private ExecutorService mes;
+
+    @Autowired
+    private ApplicationEventMulticaster multicaster;
+
+    @Async
+    public void submitDeviceCommand(final DeviceCommand deviceCommand) {
         logger.debug("Device command was submitted: {}", deviceCommand.getId());
 
         Set<UUID> subscribersIds = new HashSet<>();
@@ -83,17 +81,15 @@ public class LocalMessageBus {
         }
     }
 
-    @Asynchronous
-    public void submitDeviceCommandUpdate(@LocalMessage @Update
-                                          @Observes(
-                                              during = TransactionPhase.AFTER_SUCCESS) final DeviceCommand deviceCommand) {
+    @Async
+    public void submitDeviceCommandUpdate(final DeviceCommand deviceCommand) {
 
         logger.debug("Device command update was submitted: {}", deviceCommand.getId());
 
         if (deviceCommand.getOriginSessionId() != null) {
             Session session = sessionMonitor.getSession(deviceCommand.getOriginSessionId());
             if (session != null) {
-                mes.submit(WebsocketHandlerCreator.createCommandUpdate(session).getHandler(deviceCommand, null));
+                mes.submit(WebsocketHandlerCreator.createCommandUpdate(session, multicaster).getHandler(deviceCommand, null));
             }
         }
 
@@ -105,10 +101,8 @@ public class LocalMessageBus {
         }
     }
 
-    @Asynchronous
-    public void submitDeviceNotification(@LocalMessage @Create
-                                         @Observes(
-                                             during = TransactionPhase.AFTER_SUCCESS) final DeviceNotification deviceNotification) {
+    @Async
+    public void submitDeviceNotification(final DeviceNotification deviceNotification) {
 
         logger.debug("Device notification was submitted: {}", deviceNotification.getId());
 

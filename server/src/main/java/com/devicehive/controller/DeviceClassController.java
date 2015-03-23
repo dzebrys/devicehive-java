@@ -11,12 +11,12 @@ import com.devicehive.model.DeviceClass;
 import com.devicehive.model.ErrorResponse;
 import com.devicehive.model.updates.DeviceClassUpdate;
 import com.devicehive.service.DeviceClassService;
-import com.devicehive.util.LogExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
@@ -24,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-import static com.devicehive.auth.AllowedKeyAction.Action.*;
+import static com.devicehive.auth.AllowedKeyAction.Action.MANAGE_DEVICE_CLASS;
 import static com.devicehive.configuration.Constants.*;
 import static com.devicehive.json.strategies.JsonPolicyDef.Policy.*;
 import static javax.ws.rs.core.Response.Status.*;
@@ -34,12 +34,12 @@ import static javax.ws.rs.core.Response.Status.*;
  * RESTful API: DeviceClass</a> for details.
  */
 @Path("/device/class")
-@LogExecutionTime
+@Component
 public class DeviceClassController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceClassController.class);
 
-    @EJB
+    @Autowired
     private DeviceClassService deviceClassService;
 
 

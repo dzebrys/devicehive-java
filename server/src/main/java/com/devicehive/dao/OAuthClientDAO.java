@@ -3,10 +3,9 @@ package com.devicehive.dao;
 
 import com.devicehive.configuration.Constants;
 import com.devicehive.model.OAuthClient;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -21,7 +20,8 @@ import java.util.List;
 import static com.devicehive.model.OAuthClient.Queries.Names.*;
 import static com.devicehive.model.OAuthClient.Queries.Parameters.*;
 
-@Stateless
+@Repository
+@Transactional
 public class OAuthClientDAO {
 
     @PersistenceContext(unitName = Constants.PERSISTENCE_UNIT)
@@ -32,12 +32,10 @@ public class OAuthClientDAO {
         return client;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public OAuthClient get(Long id) {
         return em.find(OAuthClient.class, id);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public OAuthClient get(String oauthId) {
         TypedQuery<OAuthClient> query = em.createNamedQuery(GET_BY_OAUTH_ID,
                                                             OAuthClient.class);
@@ -47,7 +45,7 @@ public class OAuthClientDAO {
         return result.isEmpty() ? null : result.get(0);
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public OAuthClient get(String id, String secret) {
         TypedQuery<OAuthClient> query = em.createNamedQuery(GET_BY_OAUTH_ID_AND_SECRET, OAuthClient.class);
         query.setParameter(OAUTH_ID, id);
@@ -62,7 +60,7 @@ public class OAuthClientDAO {
         return query.executeUpdate() != 0;
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public List<OAuthClient> list(String name,
                                   String namePattern,
                                   String domain,
@@ -113,7 +111,7 @@ public class OAuthClientDAO {
 
     }
 
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+
     public OAuthClient getByName(String name) {
         TypedQuery<OAuthClient> query = em.createNamedQuery(GET_BY_NAME, OAuthClient.class);
         query.setParameter(NAME, name);

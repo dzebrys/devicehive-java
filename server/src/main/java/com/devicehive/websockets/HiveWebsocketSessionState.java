@@ -1,14 +1,14 @@
 package com.devicehive.websockets;
 
 
+import com.devicehive.auth.HivePrincipal;
+import com.devicehive.configuration.Constants;
+import com.devicehive.websockets.util.HiveEndpoint;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 
-import com.devicehive.auth.HivePrincipal;
-import com.devicehive.configuration.Constants;
-import com.devicehive.websockets.util.HiveEndpoint;
-
+import javax.websocket.Session;
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,8 +19,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.websocket.Session;
 
 public class HiveWebsocketSessionState {
 
